@@ -46,6 +46,28 @@
 html {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
+
+
+
+/* Monkeytype-style blinking cursor */
+.cursor-mt::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1.4em;
+  width: 2px;
+  background: #ffffff;
+  animation: blink 1s step-end infinite;
+}
+
+/* Blinking animation */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+/* 
 .caret {
   width: 2px;
   height: 2rem;
@@ -57,7 +79,7 @@ html {
 @keyframes blink {
   0%, 50% { opacity: 1; }
   50.01%, 100% { opacity: 0; }
-}
+} */
 
 
 
