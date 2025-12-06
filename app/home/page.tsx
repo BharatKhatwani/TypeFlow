@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import React from "react";
 import { words } from "@/lib/words";
 import { RiResetLeftFill } from "react-icons/ri";
+import WPMGraph from "@/components/WPMGraph";
 
 type TimeOption = 15 | 30 | 60 | 120 | 180;
 
@@ -20,6 +21,11 @@ export default function Page() {
   const [userInputs, setUserInputs] = React.useState<string[]>([]);
   const inputRef = React.useRef<HTMLDivElement>(null);
   const [testEnded, setTestEnded] = React.useState(false);
+  // const [storedWPM , setStoredWPM] = React.useState<number | null>(null);
+ const [wpmHistory, setWpmHistory] = React.useState<
+  { second: number; wpm: number }[]
+>([]);
+
 
   const timeDisplay: Record<TimeOption, string> = {
     15: "15s",
@@ -44,20 +50,33 @@ export default function Page() {
     setUserInputs(new Array(60).fill(""));
   };
 
-  // Timer countdown
-  React.useEffect(() => {
-    if (isTestActive && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && isTestActive) {
-      // When timer hits 0, stop the test completely
-      setIsTestActive(false);
-      // settestEnded(true);
-      setTestEnded(true);
-    }
-  }, [isTestActive, timeLeft]);
+// Timer countdown
+React.useEffect(() => {
+  if (isTestActive && timeLeft > 0) {
+    const timer = setTimeout(() => {
+
+      const updatedTimeLeft = timeLeft - 1;  
+      setTimeLeft(updatedTimeLeft);
+
+      const second = time - updatedTimeLeft;   // FIXED
+
+      const currentWPM = calculateWPM();
+
+      setWpmHistory((prevHistory) => [
+        ...prevHistory,
+        { second, wpm: currentWPM },
+      ]);
+
+    }, 1000);
+
+    return () => clearTimeout(timer);
+
+  } else if (timeLeft === 0 && isTestActive) {
+    setIsTestActive(false);
+    setTestEnded(true);
+  }
+}, [isTestActive, timeLeft]);
+
 
   // Update time left when time option changes
   React.useEffect(() => {
@@ -256,7 +275,7 @@ const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
           <div className="mt-10 w-full flex justify-center">
             <div
               ref={inputRef}
-              className={`w-full max-w-4xl bg-[#1d2633] border border-white/10 rounded-xl 
+              className={`w-full max-w-4xl bg border border-white/10 rounded-xl 
                         px-8 py-10 shadow-sm cursor-text transition-opacity
                         ${timeLeft === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
               tabIndex={0}
@@ -311,7 +330,13 @@ const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
             </button>
           </div>
 
-          {/* Instructions */}
+          {/* Resukt*/}
+       {testEnded && (
+  <div className="mt-10">
+    <WPMGraph data={wpmHistory} />
+  </div>
+)}
+
       
         </div>
       </div>
