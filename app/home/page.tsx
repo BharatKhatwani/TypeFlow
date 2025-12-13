@@ -214,10 +214,12 @@ const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
     generateWords();
     inputRef.current?.focus();
   };
+  
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
+    <div className="max-w-6xl font-mono mx-auto px-4">
       <Navbar />
+      
 
       <div className="py-6">
         <div className="text-center">

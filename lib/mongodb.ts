@@ -1,4 +1,4 @@
-// lib/mongodb.ts  ✔ Correct version
+// lib/mongodb.ts
 import { MongoClient } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
@@ -27,3 +27,9 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export default clientPromise;
+
+// For Better Auth - create a connected client and db synchronously
+// This creates the client without waiting for connection
+const authClient = new MongoClient(uri, options);
+export const db = authClient.db();
+export { authClient as client };

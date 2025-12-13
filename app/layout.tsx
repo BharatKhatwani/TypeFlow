@@ -1,31 +1,29 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
-import { JetBrains_Mono } from "next/font/google";
 
-// CONFIG
-const jetBrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
+const inter = Inter({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
 });
 
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-roboto-mono",
+});
 
 export const metadata: Metadata = {
   title: "Typing Project",
   description: "A typing test built with Next.js",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-<body className={`${jetBrainsMono.variable} antialiased`}>
-
+      <body className={`${inter.variable} ${robotoMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
