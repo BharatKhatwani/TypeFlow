@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { TypingDBService } from "@/lib/db-service";
 import { headers } from "next/headers";
+import {int, z} from "zod"
 
+// used for fetching user activity 
+
+const DaysSchema = z.coerce.number().int().min(1).max(365);
 
 export async function GET(req: Request) {
     try {
@@ -14,7 +18,7 @@ export async function GET(req: Request) {
     }
 
     const {searchParams}  = new URL(req.url);
-    const days = parseInt(searchParams.get("days") || "365");
+     const days = DaysSchema.parse(searchParams.get("days") ?? "365");
  const activity = await TypingDBService.getDailyActivity(
       session.user.id,
       days

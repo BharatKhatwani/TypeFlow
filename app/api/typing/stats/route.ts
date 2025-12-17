@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { TypingDBService } from "@/lib/db-service";
 import { headers } from "next/headers";
 
-
+// that is used to initial for the first user and uopdate the details accoring
 export async function GET(req: Request) {
   try {
       const session = await auth.api.getSession({
