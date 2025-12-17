@@ -5,6 +5,7 @@ import React from "react";
 import { words } from "@/lib/words";
 import { RiResetLeftFill } from "react-icons/ri";
 import WPMGraph from "@/components/WPMGraph";
+import { TypingHeader } from "@/components/Typing/TypingHeader";
 
 type TimeOption = 15 | 30 | 60 | 120 | 180;
 
@@ -50,6 +51,29 @@ export default function Page() {
     setUserInputs(new Array(60).fill(""));
   };
 
+
+
+  const TypingSubmit = async(payload : any) =>{
+    try {
+      const response = await fetch("/api/typing/submit" , {
+        // method : POST , 
+         method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+      })
+
+      if(!response.ok){
+        const err = await response.json();
+      throw new Error(err.error || "Failed");
+      }
+      return await response.json();
+      
+    } catch (error) {
+      console.log("Error in the field ", error);
+    }
+  }
 // Timer countdown
 React.useEffect(() => {
   if (isTestActive && timeLeft > 0) {
@@ -74,8 +98,55 @@ React.useEffect(() => {
   } else if (timeLeft === 0 && isTestActive) {
     setIsTestActive(false);
     setTestEnded(true);
+    
   }
 }, [isTestActive, timeLeft]);
+
+
+
+
+
+const submittedRef = React.useRef(false);
+
+React.useEffect(() =>{
+   if (!testEnded || submittedRef.current) return;
+
+   submittedRef.current = true;
+
+   const payload = {
+    wpm: calculateWPM(),
+    accuracy: calculateAccuracy(),
+    duration: time,
+    mode: "time",
+    text: generatedWords.join(" "),
+   }; 
+   TypingSubmit(payload);
+
+}, [testEnded])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   // Update time left when time option changes
@@ -224,54 +295,20 @@ const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
       <div className="py-6">
         <div className="text-center">
           {/* TIME SELECTOR */}
-          <div className="flex justify-center">
-            <div className="flex gap-4 bg-[#1d2633] px-6 py-3 rounded-xl shadow-sm border border-white/5">
-              {[15, 30, 60, 120, 180].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => {
-                    setTime(t as TimeOption);
-                    resetTest();
-                  }}
-                  disabled={isTestActive}
-                  className={`
-                    px-4 py-2 rounded-md text-sm transition font-medium
-                    ${
-                      time === t
-                        ? "bg-white/10 text-white shadow-sm"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
-                    }
-                    ${isTestActive ? "opacity-50 cursor-not-allowed" : ""}
-                  `}
-                >
-                  {timeDisplay[t as TimeOption]}
-                </button>
-              ))}
-            </div>
-          </div>
+        
 
           {/* STAT CARDS */}
-          <div className="mt-10 flex justify-center gap-6">
-            <div className="w-60 h-28 bg-[#1d2633] border border-white/10 rounded-xl 
-                            flex flex-col items-center justify-center shadow-sm">
-              <h1 className="text-white text-2xl py-2 font-bold">WPM</h1>
-              <p className="text-orange-400 text-xl font-semibold">{calculateWPM()}</p>
-            </div>
-
-            <div className="w-60 h-28 bg-[#1d2633] border border-white/10 rounded-xl 
-                            flex flex-col items-center justify-center shadow-sm">
-              <h1 className="text-white text-2xl py-2 font-bold">Accuracy</h1>
-              <p className="text-orange-400 text-xl font-semibold">{calculateAccuracy()}%</p>
-            </div>
-
-            <div className="w-60 h-28 bg-[#1d2633] border border-white/10 rounded-xl 
-                            flex flex-col items-center justify-center shadow-sm">
-              <h1 className="text-white text-2xl py-2 font-bold">{timeLeft}s</h1>
-              <p className="text-orange-400 text-sm">
-                {time !== null ? timeDisplay[time] : "--"}
-              </p>
-            </div>
-          </div>
+        <TypingHeader
+  time={time}
+  timeLeft={timeLeft}
+  isTestActive={isTestActive}
+  wpm={calculateWPM()}
+  accuracy={calculateAccuracy()}
+  onTimeChange={(t) => {
+    setTime(t);
+    resetTest();
+  }}
+/>
 
           {/* TYPING AREA */}
           <div className="mt-10 w-full flex justify-center">
@@ -335,6 +372,7 @@ const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
           {/* Resukt*/}
        {testEnded && (
   <div className="mt-10">
+
     <WPMGraph data={wpmHistory} />
   </div>
 )}
