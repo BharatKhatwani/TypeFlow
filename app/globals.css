@@ -164,4 +164,10 @@ html {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Remove focus outline for typing area */
+  .typing-area:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
