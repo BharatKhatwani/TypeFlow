@@ -1,5 +1,5 @@
-// types/typing.ts - TypeScript types for your app
 
+import { ObjectId } from "mongodb";
 export interface UserProfile {
   userId: string;
   username: string;
@@ -10,49 +10,69 @@ export interface UserProfile {
 
 export interface UserStats {
   userId: string;
-  // Current Records
-  bestSpeed: number; // WPM
-  bestAccuracy: number; // percentage
-  currentStreak: number; // days
-  longestStreak: number; // days
   
-  // Overall Averages
-  averageSpeed: number; // WPM
-  averageAccuracy: number; // percentage
+ 
+bestByDuration: {
+  15: {
+    wpm : number ; 
+    accuracy : number ;
+  }; 
+  30 :{
+    wpm : number ;
+    accuracy : number ;
+  };
+  60: {
+  wpm : number ;
+    accuracy : number ;
+  };
+   120 : {
+      wpm : number ;
+    accuracy : number ;
+  };
+   180: {
+      wpm : number ;
+    accuracy : number ;
+  }
+}
+  
+
   
   // Totals
+  currentStreak: number;
+  longestStreak: number;
+
+  // Totals (still useful)
   testsCompleted: number;
-  totalTime: number; // in seconds
+  totalTime: number; // seconds
   totalWordsTyped: number;
-  
-  // Last Updated
+
+  // Dates
   lastTestDate: Date;
   lastStreakDate: Date;
 }
 
+
+
 export interface TypingTest {
-  _id: string;
+  _id?: ObjectId;
+
   userId: string;
-  
-  // Test Results
+
   wpm: number;
   accuracy: number;
-  rawWpm: number;
-  
-  // Test Details
-  duration: number; // in seconds (15, 30, 60, 120)
-  mode: "words" | "time" | "quote" | "custom";
-  language: string; // "english", "spanish", etc.
-  
-  // Content
-  textContent: string; // what they typed
-  errors: number;
-  correctChars: number;
-  incorrectChars: number;
-  
-  // Metadata
-  completedAt: Date;
-  deviceType?: "desktop" | "mobile" | "tablet";
+  rawWpm?: number;
+
+  duration: number;
+
+  mode?: string;
+  language?: string;
+  textContent?: string;
+
+  errors?: number;
+  correctChars?: number;
+  incorrectChars?: number;
+
+  completedAt: Date; // DB controlled
 }
 
 export interface DailyActivity {
@@ -61,8 +81,7 @@ export interface DailyActivity {
   testsCompleted: number;
   totalTime: number; // in seconds
   bestWpm: number;
-  averageWpm: number;
-  averageAccuracy: number;
+ 
 }
 
 // MongoDB Collections Structure
