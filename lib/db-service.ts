@@ -107,7 +107,7 @@ export class DBService {
     }
   }
 
-  
+
   static async createIndexes(): Promise<void> {
     try {
       const db = await this.getDb();
@@ -119,6 +119,62 @@ export class DBService {
       console.log("Indexes created successfully");
     } catch (error) {
       console.error("Failed to create indexes:", error);
+      throw error;
+    }
+  }
+
+  static async getTypingHistory(userId: string, limit: number = 10): Promise<any[]> {
+    try {
+      const db = await this.getDb();
+      const typingTestsCollection = db.collection("typingTests");
+
+      const history = await typingTestsCollection
+        .find({ userId })
+        .sort({ completedAt: -1 })
+        .limit(limit)
+        .toArray();
+
+      return history;
+    } catch (error) {
+      console.error("Failed to get typing history:", error);
+      throw error;
+    }
+  }
+  static async getTypingHeatmap(userId: string): Promise<any> {
+    try {
+      const db = await this.getDb();
+      const typingTestsCollection = db.collection("typingTests");
+
+      const heatmapData = await typingTestsCollection.aggregate([
+        { $match: { userId } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$testDate" },
+              month: { $month: "$testDate" },
+              day: { $dayOfMonth: "$testDate" },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: {
+              $dateFromParts: {
+                year: "$_id.year",
+                month: "$_id.month",
+                day: "$_id.day",
+              },
+            },
+            count: 1,
+          },
+        },
+      ]).toArray();
+
+      return heatmapData;
+    } catch (error) {
+      console.error("Failed to get typing heatmap:", error);
       throw error;
     }
   }
