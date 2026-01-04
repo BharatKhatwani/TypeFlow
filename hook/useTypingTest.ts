@@ -43,13 +43,13 @@ export function useTypingTest(initialTime: TimeOption = 60) {
       if (timeElapsed === 0 || correctChars === 0) return 0;
       return Math.round((correctChars / 5) / timeElapsed);
     }
-    
+
     if (isTestActive && timeLeft > 0) {
       const timeElapsed = (time - timeLeft) / 60;
       if (timeElapsed === 0) return 0;
       return Math.round((correctChars / 5) / timeElapsed);
     }
-    
+
     return 0;
   }, [testEnded, time, correctChars, isTestActive, timeLeft]);
 
@@ -59,28 +59,44 @@ export function useTypingTest(initialTime: TimeOption = 60) {
     return Math.round((correctChars / totalChars) * 100);
   }, [correctChars, totalChars]);
 
-  // Timer countdown with WPM tracking
+  // Ref to access latest stats inside the interval without re-triggering it
+  const statsRef = React.useRef({ correctChars, time });
   React.useEffect(() => {
+    statsRef.current = { correctChars, time };
+  }, [correctChars, time]);
+
+  // Timer and WPM History
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+
     if (isTestActive && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        const updatedTimeLeft = timeLeft - 1;  
-        setTimeLeft(updatedTimeLeft);
+      interval = setInterval(() => {
+        setTimeLeft((prevTimeLeft) => {
+          const newTimeLeft = prevTimeLeft - 1;
 
-        const second = time - updatedTimeLeft;
-        const currentWPM = calculateWPM();
+          // Calculate WPM using the Ref to avoid dependency loop
+          const { correctChars: currentCorrectChars, time: initialTime } = statsRef.current;
+          const timeElapsed = (initialTime - newTimeLeft) / 60;
+          const currentWPM = timeElapsed > 0 ? Math.round((currentCorrectChars / 5) / timeElapsed) : 0;
 
-        setWpmHistory((prevHistory) => [
-          ...prevHistory,
-          { second, wpm: currentWPM },
-        ]);
+          setWpmHistory((prev) => [
+            ...prev,
+            { second: initialTime - newTimeLeft, wpm: currentWPM },
+          ]);
+
+          if (newTimeLeft <= 0) {
+            setIsTestActive(false);
+            setTestEnded(true);
+            return 0;
+          }
+
+          return newTimeLeft;
+        });
       }, 1000);
-
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && isTestActive) {
-      setIsTestActive(false);
-      setTestEnded(true);
     }
-  }, [isTestActive, timeLeft, time, calculateWPM]);
+
+    return () => clearInterval(interval);
+  }, [isTestActive]);
 
   // Update time left when time option changes
   React.useEffect(() => {
@@ -123,6 +139,17 @@ export function useTypingTest(initialTime: TimeOption = 60) {
     if (e.key === "Backspace") {
       e.preventDefault();
       if (inputValue.length > 0) {
+        const charToDeleteIndex = currentCharIndex - 1;
+        const currentWord = generatedWords[currentWordIndex];
+
+        if (
+          charToDeleteIndex >= 0 &&
+          charToDeleteIndex < currentWord.length &&
+          inputValue[charToDeleteIndex] === currentWord[charToDeleteIndex]
+        ) {
+          setCorrectChars((prev) => Math.max(prev - 1, 0));
+        }
+
         const newInput = inputValue.slice(0, -1);
         setInputValue(newInput);
 
@@ -130,7 +157,7 @@ export function useTypingTest(initialTime: TimeOption = 60) {
         newUserInputs[currentWordIndex] = newInput;
         setUserInputs(newUserInputs);
 
-        setCurrentCharIndex(prev => Math.max(prev - 1, 0));
+        setCurrentCharIndex((prev) => Math.max(prev - 1, 0));
       }
     }
 

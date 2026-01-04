@@ -25,7 +25,7 @@ export default function TimeSelector({
 }: TimeSelectorProps) {
   return (
     <div className="flex justify-center">
-      <div className="flex gap-4 bg-[#1d2633] px-6 py-3 rounded-xl shadow-sm border border-white/5">
+      <div className="flex gap-4 bg-[#1d2633] px-6 py-3 rounded-xl shadow-sm border border-white/5 cursor-pointer">
         {[15, 30, 60, 120, 180].map((t) => (
           <button
             key={t}
@@ -35,11 +35,11 @@ export default function TimeSelector({
             }}
             disabled={isTestActive}
             className={`
-              px-4 py-2 rounded-md text-sm transition font-medium
+              px-4 py-2 rounded-md text-sm transition font-medium cursor-pointer
               ${
                 time === t
-                  ? "bg-white/10 text-white shadow-sm"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  ? "bg-white/10 text-white shadow-sm cursor-pointer"
+                  : "text-gray-400 hover:text-white hover:bg-white/5 cursor-pointer"
               }
               ${isTestActive ? "opacity-50 cursor-not-allowed" : ""}
             `}

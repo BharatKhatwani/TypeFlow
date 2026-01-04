@@ -17,17 +17,17 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     setOpen(false); // Close dropdown
-    
+
     await authClient.signOut(); // Sign out from auth client
-    
-    window.location.href = "/auth"; // Manual redirect
+
+    window.location.href = "/"; // Redirect to home
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4">
       {/* Navbar */}
       <div className="flex justify-between items-center font-mono mt-5">
-        <Link href="/home" className="text-xl font-mono hover:text-blue-400 transition">
+        <Link href="/" className="text-xl font-mono hover:text-blue-400 transition">
           TypeFlow
         </Link>
 
@@ -52,17 +52,16 @@ export default function Navbar() {
                   {displayName}
                 </span>
 
-                <FaChevronDown 
-                  className={`text-gray-500 dark:text-gray-300 text-xs transition-transform ${
-                    open ? "rotate-180" : ""
-                  }`} 
+                <FaChevronDown
+                  className={`text-gray-500 dark:text-gray-300 text-xs transition-transform ${open ? "rotate-180" : ""
+                    }`}
                 />
               </div>
 
               {/* Dropdown */}
               {open && (
                 <div className="absolute right-0 top-full mt-2 w-32 rounded-md border border-white/10 bg-black/80 dark:bg-white/10 backdrop-blur-sm shadow-lg py-2 z-50">
-                  
+
                   <Link
                     href="/profile"
                     className="block w-full text-left px-3 py-2 text-sm hover:bg-white/10 cursor-pointer transition"
@@ -81,16 +80,17 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <Link
-              href="/auth"
+            <button
+              suppressHydrationWarning={true}
+              onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/" })}
               className="
                 relative px-4 py-2 rounded-lg border cursor-pointer
                 overflow-hidden group
               "
             >
               <span className="absolute left-0 top-0 h-full w-0 bg-blue-500/20 transition-all duration-300 group-hover:w-full" />
-              <span className="relative z-10">Login / Signup</span>
-            </Link>
+              <span className="relative z-10">Login</span>
+            </button>
           )}
         </div>
       </div>

@@ -33,18 +33,18 @@ export function TypingHeader({
     <div className="py-6 text-center">
       {/* TIME SELECTOR */}
       <div className="flex justify-center">
-        <div className="flex gap-4 bg-[#1d2633] px-6 py-3 rounded-xl shadow-sm border border-white/5">
+        <div className="flex gap-4 bg-[#1d2633] cursor-pointer px-6 py-3 rounded-xl shadow-sm border border-white/5">
           {[15, 30, 60, 120, 180].map((t) => (
             <button
               key={t}
+              suppressHydrationWarning
               onClick={() => onTimeChange(t as TimeOption)}
               disabled={isTestActive}
               className={`
-                px-4 py-2 rounded-md text-sm transition font-medium
-                ${
-                  time === t
-                    ? "bg-white/10 text-white shadow-sm"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                px-4 py-2 rounded-md text-sm transition font-medium cursor-pointer
+                ${time === t
+                  ? "bg-white/10 text-white shadow-sm"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
                 }
                 ${isTestActive ? "opacity-50 cursor-not-allowed" : ""}
               `}
