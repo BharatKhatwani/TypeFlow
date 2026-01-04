@@ -80,6 +80,7 @@ export async function handleTestFinish(
   }
 
   // 6️⃣ Persist + return updated stats
+  await DBService.addTypingTest(userId, test); // Save individual test record
   return DBService.updateUserStats(userId, updateQuery);
 }
 

@@ -47,6 +47,23 @@ export class DBService {
     }
   }
 
+  static async addTypingTest(userId: string, testData: any): Promise<void> {
+    try {
+      const db = await this.getDb();
+      const typingTestsCollection = db.collection("typingTests");
+
+      await typingTestsCollection.insertOne({
+        userId,
+        ...testData,
+        completedAt: new Date(), // Ensure consistent timestamp
+        testDate: testData.testDate || new Date() // Support both naming conventions if needed
+      });
+    } catch (error) {
+      console.error("Failed to add typing test:", error);
+      throw error;
+    }
+  }
+
   static async updateUserStats(
     userId: string,
     updateQuery: UpdateFilter<UserStats>
