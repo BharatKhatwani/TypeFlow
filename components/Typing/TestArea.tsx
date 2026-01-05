@@ -11,6 +11,7 @@ export function TestArea({
   timeLeft,
   testEnded,
 }: any) {
+  
   return (
     <div className="mt-10 w-full flex justify-center">
       <div

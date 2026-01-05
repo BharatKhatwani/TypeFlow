@@ -139,6 +139,55 @@ export class DBService {
       throw error;
     }
   }
+  static async getLeaderboard(topN: number = 10, duration: number = 60): Promise<any[]> {
+    try {
+      const db = await this.getDb();
+      const userStatsCollection = db.collection<UserStats>("userStats");
+
+      const sortFieldWpm = `bestByDuration.${duration}.wpm`;
+      const sortFieldAcc = `bestByDuration.${duration}.accuracy`;
+
+      const leaderboard = await userStatsCollection.aggregate([
+        {
+          $sort: {
+            [sortFieldWpm]: -1,
+            [sortFieldAcc]: -1
+          }
+        },
+        { $limit: topN },
+        {
+          $lookup: {
+            from: "user",
+            localField: "userId",
+            foreignField: "id",
+            as: "userDetails"
+          }
+        },
+        {
+          $unwind: {
+            path: "$userDetails",
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $project: {
+            userId: 1,
+            wpm: `$bestByDuration.${duration}.wpm`,
+            accuracy: `$bestByDuration.${duration}.accuracy`,
+            testsCompleted: 1,
+            name: "$userDetails.name",
+            image: "$userDetails.image",
+            email: "$userDetails.email"
+          }
+        }
+      ]).toArray();
+
+      return leaderboard;
+    } catch (error) {
+      console.error("Failed to get leaderboard:", error);
+      throw error;
+    }
+  }
 
   static async getTypingHistory(userId: string, limit: number = 10): Promise<any[]> {
     try {

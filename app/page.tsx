@@ -28,6 +28,53 @@ export default function Page() {
     resetTest,
   } = useTypingTest();
 
+
+ 
+
+
+  const submitTest = async () => {
+    try {
+      const response = await fetch("/api/typing/finish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          duration: time,
+          wpm: calculateWPM(),
+          accuracy: calculateAccuracy(),
+          wordsTyped: generatedWords
+            .slice(0, currentWordIndex + 1)
+            .reduce((acc, word, index) => {
+              if (index === currentWordIndex) {
+                return acc + inputValue.trim().split(" ").length;
+              }
+              return acc + word.split(" ").length;
+            }, 0),
+          timeTaken: time - timeLeft,
+          testDate: new Date(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit test");
+      }
+
+      const data = await response.json();
+      console.log("Updated stats:", data);
+
+    } catch (error) {
+      console.error("Error submitting test:", error);
+    }
+  };
+
+  React.useEffect(() => {
+    if (testEnded) {
+      submitTest();
+    }
+  }, [testEnded]);
+
+
   return (
     <div className="max-w-6xl font-mono mx-auto px-4">
       <Navbar />
