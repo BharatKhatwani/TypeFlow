@@ -1,7 +1,7 @@
-// @/lib/db-service.ts
+
 import clientPromise from "@/lib/mongodb";
 import { UserStats } from "@/types/typing";
-import { UpdateFilter } from "mongodb";
+import { UpdateFilter, ObjectId } from "mongodb";
 
 export class DBService {
   private static async getDb() {
@@ -55,8 +55,8 @@ export class DBService {
       await typingTestsCollection.insertOne({
         userId,
         ...testData,
-        completedAt: new Date(), // Ensure consistent timestamp
-        testDate: testData.testDate || new Date() // Support both naming conventions if needed
+        completedAt: new Date(),
+        testDate: testData.testDate || new Date()
       });
     } catch (error) {
       console.error("Failed to add typing test:", error);
@@ -124,7 +124,6 @@ export class DBService {
     }
   }
 
-
   static async createIndexes(): Promise<void> {
     try {
       const db = await this.getDb();
@@ -139,33 +138,50 @@ export class DBService {
       throw error;
     }
   }
+
+  // ✅ FIXED: Convert string userId to ObjectId for matching with user._id
   static async getLeaderboard(topN: number = 10, duration: number = 60): Promise<any[]> {
     try {
       const db = await this.getDb();
       const userStatsCollection = db.collection<UserStats>("userStats");
 
-      const sortFieldWpm = `bestByDuration.${duration}.wpm`;
-      const sortFieldAcc = `bestByDuration.${duration}.accuracy`;
-
       const leaderboard = await userStatsCollection.aggregate([
         {
+          $match: {
+            [`bestByDuration.${duration}.wpm`]: { $exists: true, $gt: 0 }
+          }
+        },
+        {
           $sort: {
-            [sortFieldWpm]: -1,
-            [sortFieldAcc]: -1
+            [`bestByDuration.${duration}.wpm`]: -1,
+            [`bestByDuration.${duration}.accuracy`]: -1
           }
         },
         { $limit: topN },
         {
+          // Convert userId string to ObjectId for matching
+          $addFields: {
+            userIdAsObjectId: { 
+              $cond: {
+                if: { $regexMatch: { input: "$userId", regex: /^[0-9a-fA-F]{24}$/ } },
+                then: { $toObjectId: "$userId" },
+                else: null
+              }
+            }
+          }
+        },
+        {
+          // Join with user collection using ObjectId
           $lookup: {
             from: "user",
-            localField: "userId",
-            foreignField: "id",
-            as: "userDetails"
+            localField: "userIdAsObjectId",
+            foreignField: "_id",
+            as: "userInfo"
           }
         },
         {
           $unwind: {
-            path: "$userDetails",
+            path: "$userInfo",
             preserveNullAndEmptyArrays: true
           }
         },
@@ -175,16 +191,21 @@ export class DBService {
             wpm: `$bestByDuration.${duration}.wpm`,
             accuracy: `$bestByDuration.${duration}.accuracy`,
             testsCompleted: 1,
-            name: "$userDetails.name",
-            image: "$userDetails.image",
-            email: "$userDetails.email"
+            name: "$userInfo.name",
+            image: "$userInfo.image",
+            email: "$userInfo.email"
           }
         }
       ]).toArray();
 
+      console.log("✅ Leaderboard fetched:", leaderboard.length, "entries");
+      if (leaderboard.length > 0) {
+        console.log("📊 Sample entry:", JSON.stringify(leaderboard[0], null, 2));
+      }
+      
       return leaderboard;
     } catch (error) {
-      console.error("Failed to get leaderboard:", error);
+      console.error("❌ Failed to get leaderboard:", error);
       throw error;
     }
   }
@@ -206,6 +227,7 @@ export class DBService {
       throw error;
     }
   }
+
   static async getTypingHeatmap(userId: string): Promise<any> {
     try {
       const db = await this.getDb();
