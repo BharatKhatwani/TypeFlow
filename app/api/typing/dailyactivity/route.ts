@@ -44,7 +44,7 @@ export async function GET(request: Request) {
             bestByDuration: stats.bestByDuration as Record<string, any>,
         };
 
-        
+
         const validatedData = dailyActivitySchema.parse(responseData);
 
         return NextResponse.json(validatedData, { status: 200 });

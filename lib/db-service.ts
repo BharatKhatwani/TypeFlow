@@ -2,12 +2,16 @@
 import clientPromise from "@/lib/mongodb";
 import { UserStats } from "@/types/typing";
 import { UpdateFilter, ObjectId } from "mongodb";
+import { TypingTestInput, LeaderboardEntry, TypingTest } from "@/types/typing";
 
 export class DBService {
   private static async getDb() {
     const client = await clientPromise;
     return client.db();
   }
+
+
+  
 
   static async initializeUserStats(userId: string): Promise<void> {
     try {
@@ -47,7 +51,7 @@ export class DBService {
     }
   }
 
-  static async addTypingTest(userId: string, testData: any): Promise<void> {
+  static async addTypingTest(userId: string, testData: TypingTestInput): Promise<void> {
     try {
       const db = await this.getDb();
       const typingTestsCollection = db.collection("typingTests");
@@ -139,51 +143,58 @@ export class DBService {
     }
   }
 
-  // ✅ FIXED: Convert string userId to ObjectId for matching with user._id
-  static async getLeaderboard(topN: number = 10, duration: number = 60): Promise<any[]> {
-    try {
-      const db = await this.getDb();
-      const userStatsCollection = db.collection<UserStats>("userStats");
+  
+ static async getLeaderboard(
+  topN: number = 10,
+  duration: number = 60
+): Promise<LeaderboardEntry[]> {
+  try {
+    const db = await this.getDb();
+    const userStatsCollection = db.collection<UserStats>("userStats");
 
-      const leaderboard = await userStatsCollection.aggregate([
+    const leaderboard = await userStatsCollection
+      .aggregate<LeaderboardEntry>([
         {
           $match: {
-            [`bestByDuration.${duration}.wpm`]: { $exists: true, $gt: 0 }
-          }
+            [`bestByDuration.${duration}.wpm`]: { $exists: true, $gt: 0 },
+          },
         },
         {
           $sort: {
             [`bestByDuration.${duration}.wpm`]: -1,
-            [`bestByDuration.${duration}.accuracy`]: -1
-          }
+            [`bestByDuration.${duration}.accuracy`]: -1,
+          },
         },
         { $limit: topN },
         {
-          // Convert userId string to ObjectId for matching
           $addFields: {
-            userIdAsObjectId: { 
+            userIdAsObjectId: {
               $cond: {
-                if: { $regexMatch: { input: "$userId", regex: /^[0-9a-fA-F]{24}$/ } },
+                if: {
+                  $regexMatch: {
+                    input: "$userId",
+                    regex: /^[0-9a-fA-F]{24}$/,
+                  },
+                },
                 then: { $toObjectId: "$userId" },
-                else: null
-              }
-            }
-          }
+                else: null,
+              },
+            },
+          },
         },
         {
-          // Join with user collection using ObjectId
           $lookup: {
             from: "user",
             localField: "userIdAsObjectId",
             foreignField: "_id",
-            as: "userInfo"
-          }
+            as: "userInfo",
+          },
         },
         {
           $unwind: {
             path: "$userInfo",
-            preserveNullAndEmptyArrays: true
-          }
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $project: {
@@ -193,27 +204,32 @@ export class DBService {
             testsCompleted: 1,
             name: "$userInfo.name",
             image: "$userInfo.image",
-            email: "$userInfo.email"
-          }
-        }
-      ]).toArray();
+            email: "$userInfo.email",
+          },
+        },
+      ])
+      .toArray();
 
-      console.log("✅ Leaderboard fetched:", leaderboard.length, "entries");
-      if (leaderboard.length > 0) {
-        console.log("📊 Sample entry:", JSON.stringify(leaderboard[0], null, 2));
-      }
-      
-      return leaderboard;
-    } catch (error) {
-      console.error("❌ Failed to get leaderboard:", error);
-      throw error;
+    console.log("✅ Leaderboard fetched:", leaderboard.length, "entries");
+    if (leaderboard.length > 0) {
+      console.log(
+        " Sample entry:",
+        JSON.stringify(leaderboard[0], null, 2)
+      );
     }
-  }
 
-  static async getTypingHistory(userId: string, limit: number = 10): Promise<any[]> {
+    return leaderboard;
+  } catch (error) {
+    console.error(" Failed to get leaderboard:", error);
+    throw error;
+  }
+}
+
+
+  static async getTypingHistory(userId: string, limit: number = 10): Promise<TypingTest[]> {
     try {
       const db = await this.getDb();
-      const typingTestsCollection = db.collection("typingTests");
+      const typingTestsCollection = db.collection<TypingTest>("typingTests");
 
       const history = await typingTestsCollection
         .find({ userId })

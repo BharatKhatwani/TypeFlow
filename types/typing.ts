@@ -10,33 +10,33 @@ export interface UserProfile {
 
 export interface UserStats {
   userId: string;
-  
- 
-bestByDuration: {
-  15: {
-    wpm : number ; 
-    accuracy : number ;
-  }; 
-  30 :{
-    wpm : number ;
-    accuracy : number ;
-  };
-  60: {
-  wpm : number ;
-    accuracy : number ;
-  };
-   120 : {
-      wpm : number ;
-    accuracy : number ;
-  };
-   180: {
-      wpm : number ;
-    accuracy : number ;
-  }
-}
-  
 
-  
+
+  bestByDuration: {
+    15: {
+      wpm: number;
+      accuracy: number;
+    };
+    30: {
+      wpm: number;
+      accuracy: number;
+    };
+    60: {
+      wpm: number;
+      accuracy: number;
+    };
+    120: {
+      wpm: number;
+      accuracy: number;
+    };
+    180: {
+      wpm: number;
+      accuracy: number;
+    }
+  }
+
+
+
   // Totals
   currentStreak: number;
   longestStreak: number;
@@ -81,7 +81,7 @@ export interface DailyActivity {
   testsCompleted: number;
   totalTime: number; // in seconds
   bestWpm: number;
- 
+
 }
 
 // MongoDB Collections Structure
@@ -91,3 +91,33 @@ export const collections = {
   typingTests: "typingTests",
   dailyActivity: "dailyActivity",
 };
+
+
+export interface TypingTestInput{
+    duration : number , 
+    wpm : number , 
+  accuracy : number , 
+    wordsTyped: number;
+  timeTaken: number;
+  testDate?: Date;
+}
+export interface LeaderboardEntry {
+  userId: string;
+  wpm: number;
+  accuracy: number;
+  testsCompleted: number;
+  name?: string;
+  image?: string;
+  email?: string;
+}
+export interface TypingTest {
+  _id?: ObjectId;
+  userId: string;
+  duration: number;
+  wpm: number;
+  accuracy: number;
+  wordsTyped: number;
+  timeTaken: number;
+  completedAt: Date;
+  testDate: Date;
+}

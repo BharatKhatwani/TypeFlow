@@ -14,7 +14,14 @@ import {
 } from "recharts";
 import { useTheme } from "next-themes";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: { value: number }[];
+  label?: number;
+};
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background/90 backdrop-blur-sm p-3 rounded-lg border border-border shadow-lg">
@@ -73,13 +80,13 @@ export default function WPMGraph({
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={isDark ? "#3b82f6" : "#2563eb"} stopOpacity={0.8}/>
-              <stop offset="95%" stopColor={isDark ? "#3b82f6" : "#2563eb"} stopOpacity={0.1}/>
+              <stop offset="5%" stopColor={isDark ? "#3b82f6" : "#2563eb"} stopOpacity={0.8} />
+              <stop offset="95%" stopColor={isDark ? "#3b82f6" : "#2563eb"} stopOpacity={0.1} />
             </linearGradient>
           </defs>
-          <CartesianGrid 
-            strokeDasharray="3 3" 
-            stroke={isDark ? "#374151" : "#e5e7eb"} 
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={isDark ? "#374151" : "#e5e7eb"}
             vertical={false}
           />
           <XAxis
@@ -99,9 +106,9 @@ export default function WPMGraph({
             tickFormatter={(value) => `${value}`}
             width={40}
           />
-          <Tooltip 
-            content={<CustomTooltip />} 
-            cursor={{ 
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{
               stroke: isDark ? '#4b5563' : '#d1d5db',
               strokeWidth: 1,
               strokeDasharray: '3 3'
@@ -114,15 +121,15 @@ export default function WPMGraph({
             strokeWidth={2}
             fillOpacity={1}
             fill={`url(#${gradientId})`}
-            activeDot={{ 
-              r: 6, 
-              stroke: isDark ? "#1e40af" : "#1e40af", 
-              strokeWidth: 2, 
-              fill: isDark ? "#3b82f6" : "#2563eb" 
+            activeDot={{
+              r: 6,
+              stroke: isDark ? "#1e40af" : "#1e40af",
+              strokeWidth: 2,
+              fill: isDark ? "#3b82f6" : "#2563eb"
             }}
           />
-          <ReferenceLine 
-            y={uniqueData.length > 0 ? uniqueData[uniqueData.length - 1].wpm : 0} 
+          <ReferenceLine
+            y={uniqueData.length > 0 ? uniqueData[uniqueData.length - 1].wpm : 0}
             stroke={isDark ? "#10b981" : "#059669"}
             strokeDasharray="3 3"
             strokeWidth={2}

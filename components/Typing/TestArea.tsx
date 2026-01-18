@@ -1,5 +1,24 @@
 import getCharClass from "./getCharClass";
 
+interface TestAreaProps {
+  generatedWords: string[];
+
+  handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+
+  inputValue: string;
+
+  currentWordIndex: number;
+  currentCharIndex: number;
+
+  userInputs: string[];
+
+  timeLeft: number;
+
+  inputRef: React.RefObject<HTMLDivElement | null>;
+
+  testEnded: boolean;
+}
+
 export function TestArea({
   generatedWords,
   handleKeyDown,
@@ -10,8 +29,8 @@ export function TestArea({
   inputRef,
   timeLeft,
   testEnded,
-}: any) {
-  
+}: TestAreaProps) {
+
   return (
     <div className="mt-10 w-full flex justify-center">
       <div
