@@ -35,9 +35,7 @@ export default function Navbar() {
           <Link href="/leaderboard" className="hover:text-blue-400 transition">
             Leaderboard
           </Link>
-          <Link href="/battle" className="hover:text-blue-400 transition">
-            Friend Battle
-          </Link>
+         
 
           <ModeToggle />
 
