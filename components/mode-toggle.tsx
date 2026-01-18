@@ -8,9 +8,10 @@ export function ModeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Ensures client-only theme detection runs after hydration; safe to set state once.
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   if (!mounted || !resolvedTheme) return null;
 
@@ -27,22 +28,8 @@ export function ModeToggle() {
         hover:bg-black/5 dark:hover:bg-white/10
       "
     >
-      {/* Sun Icon */}
-      <Sun
-        className="
-          h-5 w-5 text-yellow-500 transition-all duration-300
-          dark:opacity-0 dark:rotate-90 dark:scale-0
-        "
-      />
-
-      {/* Moon Icon */}
-      <Moon
-        className="
-          h-5 w-5 absolute text-blue-400 transition-all duration-300
-          opacity-0 scale-0 rotate-90
-          dark:opacity-100 dark:scale-100 dark:rotate-0
-        "
-      />
+      <Sun className="h-5 w-5 text-yellow-500 transition-all duration-300 dark:opacity-0 dark:rotate-90 dark:scale-0" />
+      <Moon className="h-5 w-5 absolute text-blue-400 transition-all duration-300 opacity-0 scale-0 rotate-90 dark:opacity-100 dark:scale-100 dark:rotate-0" />
     </button>
   );
 }
