@@ -8,6 +8,8 @@ export function ModeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // Ensures client-only theme detection runs after hydration; safe to set state once.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   if (!mounted || !resolvedTheme) return null;
