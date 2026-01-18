@@ -1,5 +1,6 @@
 import { DBService } from "./db-service";
 import { UserStats } from "@/types/typing";
+import { UpdateFilter } from "mongodb";
 
 export type TestResult = {
   duration: 15 | 30 | 60 | 120 | 180;
@@ -60,7 +61,7 @@ export async function handleTestFinish(
   const longestStreak = Math.max(stats.longestStreak, currentStreak);
 
   // 5️⃣ ----- BUILD SAFE UPDATE QUERY -----
-  const updateQuery: any = {
+  const updateQuery: UpdateFilter<UserStats> = {
     $set: {
       testsCompleted,
       totalTime,
@@ -73,7 +74,10 @@ export async function handleTestFinish(
   };
 
   if (shouldUpdateBest) {
-    updateQuery.$set[`bestByDuration.${durationKey}`] = {
+    if (!updateQuery.$set) {
+      updateQuery.$set = {};
+    }
+    (updateQuery.$set as Record<string, unknown>)[`bestByDuration.${durationKey}`] = {
       wpm: test.wpm,
       accuracy: test.accuracy,
     };

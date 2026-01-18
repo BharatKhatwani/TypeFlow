@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { useSession } from "@/lib/auth-client";
 import React, { useEffect, useState } from "react";
 import Heatmap from "@/components/Heatmap";
+import Image from "next/image";
 
 interface UserStats {
   currentStreak: number;
@@ -87,10 +88,12 @@ export default function Page() {
           {/* LEFT: Avatar + Name */}
           <div className="flex items-center gap-6">
             {session?.user.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt="Profile"
-                className="w-16 h-16 rounded-full border-2 border-orange-500/50"
+                width={64}
+                height={64}
+                className="rounded-full border-2 border-orange-500/50 object-cover"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 text-2xl font-bold">

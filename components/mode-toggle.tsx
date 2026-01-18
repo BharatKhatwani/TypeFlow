@@ -2,18 +2,18 @@
 
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export function ModeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
 
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
+
+  if (!resolvedTheme) return null;
+
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       className="
         flex items-center justify-center 
         w-10 h-10 rounded-lg
@@ -22,7 +22,7 @@ export function ModeToggle() {
         hover:bg-black/5 dark:hover:bg-white/10
       "
     >
-      {/* Sun Icon (light mode) */}
+      {/* Sun Icon */}
       <Sun
         className="
           h-5 w-5 text-yellow-500 transition-all duration-300
@@ -30,7 +30,7 @@ export function ModeToggle() {
         "
       />
 
-      {/* Moon Icon (dark mode) */}
+      {/* Moon Icon */}
       <Moon
         className="
           h-5 w-5 absolute text-blue-400 transition-all duration-300

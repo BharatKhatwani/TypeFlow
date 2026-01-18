@@ -1,9 +1,8 @@
-
-
 "use client";
 
 import Navbar from "@/components/Navbar";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface LeaderboardEntry {
   userId: string;
@@ -118,10 +117,12 @@ export default function LeaderboardPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {entry.image ? (
-                              <img
+                              <Image
                                 src={entry.image}
                                 alt={displayName}
-                                className="w-10 h-10 rounded-full border border-border dark:border-white/10"
+                                width={40}
+                                height={40}
+                                className="rounded-full border border-border dark:border-white/10 object-cover"
                               />
                             ) : (
                               <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold border border-orange-500/20">

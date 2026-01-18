@@ -1,8 +1,13 @@
 
 import clientPromise from "@/lib/mongodb";
 import { UserStats } from "@/types/typing";
-import { UpdateFilter, ObjectId } from "mongodb";
+import { UpdateFilter } from "mongodb";
 import { TypingTestInput, LeaderboardEntry, TypingTest } from "@/types/typing";
+
+interface TypingHeatmapEntry {
+  date: Date;
+  count: number;
+}
 
 export class DBService {
   private static async getDb() {
@@ -244,7 +249,7 @@ export class DBService {
     }
   }
 
-  static async getTypingHeatmap(userId: string): Promise<any> {
+  static async getTypingHeatmap(userId: string): Promise<TypingHeatmapEntry[]> {
     try {
       const db = await this.getDb();
       const typingTestsCollection = db.collection("typingTests");
@@ -276,7 +281,7 @@ export class DBService {
         },
       ]).toArray();
 
-      return heatmapData;
+      return heatmapData as TypingHeatmapEntry[];
     } catch (error) {
       console.error("Failed to get typing heatmap:", error);
       throw error;

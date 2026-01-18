@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -10,7 +8,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   Area,
-  AreaChart
+  AreaChart,
 } from "recharts";
 import { useTheme } from "next-themes";
 
