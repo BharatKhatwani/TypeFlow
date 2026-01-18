@@ -39,8 +39,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       mongoose:
-        specifier: ^9.0.0
-        version: 9.1.1
+        specifier: ^9.1.2
+        version: 9.1.4
       motion:
         specifier: ^12.23.25
         version: 12.23.26(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -2317,8 +2317,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@9.1.1:
-    resolution: {integrity: sha512-/CgKSAmjzgIj4o1FyWZIpQ2rmUQlhalwWd4l/Ht3XUVWscHRHev1TIwKz1ADNC5tHHyOQEaUDkEh0jI91c4Ydw==}
+  mongoose@9.1.4:
+    resolution: {integrity: sha512-V8JIyoWKWW+R2COlOsh6gaYw9TvczSiP/cN3Yuk1pv7ws5VNFAy5GPrK8jfz9tVYovmqdWOJRurMjL4ilYn9wA==}
     engines: {node: '>=20.19.0'}
 
   motion-dom@12.23.23:
@@ -5088,7 +5088,7 @@ snapshots:
       bson: 7.0.0
       mongodb-connection-string-url: 7.0.0
 
-  mongoose@9.1.1:
+  mongoose@9.1.4:
     dependencies:
       kareem: 3.0.0
       mongodb: 7.0.0
