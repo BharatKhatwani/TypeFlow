@@ -1,5 +1,5 @@
 // lib/mongodb.ts
-import { MongoClient } from "mongodb";
+import { MongoClient, Db } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
@@ -10,26 +10,34 @@ const options = {};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
+let db: Db;
 
 if (process.env.NODE_ENV === "development") {
+  
   const globalWithMongo = global as typeof globalThis & {
+    _mongoClient?: MongoClient;
     _mongoClientPromise?: Promise<MongoClient>;
   };
 
-  if (!globalWithMongo._mongoClientPromise) {
+  if (!globalWithMongo._mongoClient) {
     client = new MongoClient(uri, options);
+    globalWithMongo._mongoClient = client;
     globalWithMongo._mongoClientPromise = client.connect();
+  } else {
+    client = globalWithMongo._mongoClient;
   }
-  clientPromise = globalWithMongo._mongoClientPromise;
+  clientPromise = globalWithMongo._mongoClientPromise!;
 } else {
+  
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
 
+
+db = client.db();
+
+
 export default clientPromise;
 
-// For Better Auth - create a connected client and db synchronously
-// This creates the client without waiting for connection
-const authClient = new MongoClient(uri, options);
-export const db = authClient.db();
-export { authClient as client };
+
+export { client, db };
