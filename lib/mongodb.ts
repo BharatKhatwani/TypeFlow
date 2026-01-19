@@ -1,43 +1,35 @@
-// lib/mongodb.ts
-import { MongoClient, Db } from "mongodb";
+import { MongoClient } from "mongodb";
 
-if (!process.env.MONGODB_URI) {
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
-const uri = process.env.MONGODB_URI;
 const options = {};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
-let db: Db;
+
+declare global {
+
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
 
 if (process.env.NODE_ENV === "development") {
-  
-  const globalWithMongo = global as typeof globalThis & {
-    _mongoClient?: MongoClient;
-    _mongoClientPromise?: Promise<MongoClient>;
-  };
-
-  if (!globalWithMongo._mongoClient) {
+  if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
-    globalWithMongo._mongoClient = client;
-    globalWithMongo._mongoClientPromise = client.connect();
-  } else {
-    client = globalWithMongo._mongoClient;
+    global._mongoClientPromise = client.connect();
   }
-  clientPromise = globalWithMongo._mongoClientPromise!;
+  clientPromise = global._mongoClientPromise;
 } else {
-  
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
 
-
-db = client.db();
-
-
 export default clientPromise;
 
 
-export { client, db };
+
+export const authClient = new MongoClient(uri, options);
+export const db = authClient.db();
